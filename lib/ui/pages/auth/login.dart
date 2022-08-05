@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import '../../../domain/controller/AuthController.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -10,6 +13,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController controlUser = TextEditingController();
   TextEditingController controlPass = TextEditingController();
+  AuthController controllerUser = Get.find();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,12 +45,35 @@ class _LoginState extends State<Login> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.login)),
+                  IconButton(
+                      onPressed: () {
+                        controllerUser
+                            .enviarDatos(http.Client(), controlUser.text,
+                                controlPass.text)
+                            .then((value) => {
+                                  if (controllerUser.users?.isNotEmpty == true)
+                                    {Get.offNamed('/Principal')}
+                                  else
+                                    {
+                                      Get.showSnackbar(
+                                        const GetSnackBar(
+                                          title: 'Error',
+                                          message: 'Verificar credenciales',
+                                          icon: Icon(Icons.warning),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      )
+                                    }
+                                });
+                      },
+                      icon: const Icon(Icons.login)),
                   const SizedBox(
                     width: 10,
                   ),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.toNamed('/register');
+                      },
                       icon: const Icon(Icons.app_registration))
                 ],
               )
